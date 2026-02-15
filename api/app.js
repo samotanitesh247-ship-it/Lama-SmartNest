@@ -1,7 +1,8 @@
-import express from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser";
+import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import { connectDB } from "./lib/db.js";
 
 import authRoute from "./routes/auth.route.js";
 import postRoute from "./routes/post.route.js";
@@ -10,26 +11,26 @@ import userRoute from "./routes/user.route.js";
 import chatRoute from "./routes/chat.route.js";
 import messageRoute from "./routes/message.route.js";
 
-// Load environment variables
-console.log("Hello")
+console.log("Hello");
 dotenv.config();
 
 const app = express();
+connectDB();
 
-// Middleware
-const corsOptions = {
-  origin: 'https://your-frontend-app.vercel.app', // Replace with your Vercel URL
-  methods: 'GET,POST,PUT,DELETE', // Allow only specific methods as per your needs
-  credentials: true, // Include cookies if needed for session handling
-};
-app.use(cors(corsOptions));
+// ✅ CORRECT CORS (for localhost frontend)
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 
-app.get('/', (req, res) => {
-  res.send('Hello from the backend!');
+app.get("/", (req, res) => {
+  res.send("Hello from backend");
 });
-// Routes
+
+// routes
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/posts", postRoute);
@@ -37,8 +38,7 @@ app.use("/api/test", testRoute);
 app.use("/api/chats", chatRoute);
 app.use("/api/messages", messageRoute);
 
-// Start server
 const PORT = process.env.PORT || 8800;
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
